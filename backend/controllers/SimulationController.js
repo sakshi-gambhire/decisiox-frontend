@@ -1,4 +1,4 @@
-import { createSimulation, getSimulationsByUser } from "../models/SimulationModel.js";
+import { createSimulation, getSimulationsByUser } from "../models/simulationModel.js";
 import pool from "../config/db.js";
 export const saveSimulation = async (req, res) => {
   try {
