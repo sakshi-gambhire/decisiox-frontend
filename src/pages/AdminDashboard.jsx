@@ -36,7 +36,7 @@ useEffect(() => {
   const token = localStorage.getItem("token");
 
   const riskRes = await fetch(
-    "http://localhost:5000/api/admin/risk-distribution",
+    "https://decisio-x-lu67.onrender.com/api/admin/risk-distribution",
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -45,7 +45,7 @@ useEffect(() => {
   );
 
   const strategyRes = await fetch(
-    "http://localhost:5000/api/admin/strategy-popularity",
+    "https://decisio-x-lu67.onrender.com/api/admin/strategy-popularity",
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -70,7 +70,7 @@ try {
 const token = localStorage.getItem("token");
 
 const response = await fetch(
-"http://localhost:5000/api/admin/user-growth",
+"https://decisio-x-lu67.onrender.com/api/admin/user-growth",
 {
 headers: {
 Authorization: `Bearer ${token}`
@@ -105,7 +105,7 @@ try {
 const token = localStorage.getItem("token");
 
 const response = await fetch(
-"http://localhost:5000/api/admin/stats",
+"https://decisio-x-lu67.onrender.com/api/admin/stats",
 {
 headers: {
 Authorization: `Bearer ${token}`

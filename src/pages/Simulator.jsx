@@ -61,7 +61,7 @@ const [aiLoading, setAiLoading] = useState(false);
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        "http://localhost:5000/api/simulations/history",
+        "https://decisio-x-lu67.onrender.com/api/simulations/history",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -263,7 +263,7 @@ if (savings < income * 0.5) {
       const token = localStorage.getItem("token");
 
       await fetch(
-        "http://localhost:5000/api/simulations",
+        "https://decisio-x-lu67.onrender.com/api/simulations",
         {
           method: "POST",
           headers: {
@@ -296,7 +296,7 @@ if (savings < income * 0.5) {
       // AI API call
 // AI API call
 const aiRes = await fetch(
-  "http://localhost:5000/api/ai/recommendation",
+  "https://decisio-x-lu67.onrender.com/api/ai/recommendation",
   {
     method: "POST",
     headers: {
