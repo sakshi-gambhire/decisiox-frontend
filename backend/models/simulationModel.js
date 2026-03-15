@@ -15,7 +15,7 @@ export const createSimulation = async (
 ) => {
 
   const query = `
-    INSERT INTO simulations
+  INSERT INTO simulations
 (user_id, age, monthly_income, existing_savings, investment_amount, risk_level, investment_horizon, investment_goal, strategy)
   `;
 
