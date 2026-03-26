@@ -28,7 +28,7 @@ const handleSave = async () => {
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch("https://decisio-x-lu67.onrender.com/api/admin/settings", {
+    const res = await fetch("https://decisiox-backend.onrender.com/api/admin/settings", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

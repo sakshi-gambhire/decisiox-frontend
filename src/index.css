@@ -183,3 +183,6 @@ button:focus-visible {
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-in-out;
 }
+body {
+  background-color: #f7f7fb;   /* same as your UI */
+}

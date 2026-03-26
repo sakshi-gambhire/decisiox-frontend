@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { ReactTyped } from "react-typed";
 import img1 from "../assets/img1.svg";
 import { motion } from "framer-motion";
-
-
+import typingSound from "../assets/typing.mp3";
+import { useRef } from "react";
+import FloatingChat from "../components/FloatingChat";
 
 import {
   PieChart,
@@ -46,6 +46,9 @@ const [error, setError] = useState("");
 const [warnings, setWarnings] = useState({});
 // AI Advice state
 const [aiAdvice, setAiAdvice] = useState("");
+const [typedAdvice, setTypedAdvice] = useState("");
+const audioRef = useRef(null);
+
 const [aiLoading, setAiLoading] = useState(false);
 
   // AI Advice state
@@ -54,31 +57,74 @@ const [aiLoading, setAiLoading] = useState(false);
   useEffect(() => {
     fetchHistory();
   }, []);
+  useEffect(() => {
+  audioRef.current = new Audio(typingSound);
+  audioRef.current.volume = 0.15;
+  audioRef.current.loop = true; // 🔥 continuous sound
+}, []);
+useEffect(() => {
+  if (!aiAdvice) return;
 
-  const fetchHistory = async () => {
-    try {
+  let i = 0;
+  setTypedAdvice("");
 
-      const token = localStorage.getItem("token");
+  // 🔥 START SOUND
+  if (audioRef.current) {
+    audioRef.current.currentTime = 0;
+    audioRef.current.play().catch(() => {});
+  }
 
-      const res = await fetch(
-        "https://decisio-x-lu67.onrender.com/api/simulations/history",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  const typing = setInterval(() => {
+    if (i < aiAdvice.length) {
+      setTypedAdvice((prev) => prev + aiAdvice.charAt(i));
+      i++;
+    } else {
+      clearInterval(typing);
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setHistory(data);
+      // 🔥 STOP SOUND
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       }
+    }
+  }, 35); // slower typing
 
-    } catch (err) {
-      console.error(err);
+  return () => {
+    clearInterval(typing);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
   };
+}, [aiAdvice]);
+
+const fetchHistory = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch("https://decisiox-backend.onrender.com/api/simulations/history", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json(); // ✅ FIXED
+
+    console.log("HISTORY DATA:", data);
+
+    if (data.success) {
+  if (data.success) {
+  setHistory(data.simulations); // ✅ CORRECT
+} // depending backend
+}
+
+  } catch (error) {
+    console.error("Error fetching history:", error);
+  }
+};
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -262,26 +308,29 @@ if (savings < income * 0.5) {
 
       const token = localStorage.getItem("token");
 
-      await fetch(
-        "https://decisio-x-lu67.onrender.com/api/simulations",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            age: formData.age,
-            income: formData.income,
-            savings: formData.savings,
-            investment_amount: formData.amount,
-            risk_level: formData.risk,
-            investment_horizon: formData.horizon,
-            investment_goal: formData.goal,
-            strategy: strategy
-          }),
-        }
-      );
+      const res = await fetch(
+  "https://decisiox-backend.onrender.com/api/simulations",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      age: formData.age,
+      income: formData.income,
+      savings: formData.savings,
+      investment_amount: formData.amount,
+      risk_level: formData.risk,
+      investment_horizon: formData.horizon,
+      investment_goal: formData.goal,
+      strategy: strategy
+    }),
+  }
+);
+
+const data = await res.json();
+console.log("SAVE RESPONSE:", data);
 
       const newResult = {
         ...formData,
@@ -296,7 +345,7 @@ if (savings < income * 0.5) {
       // AI API call
 // AI API call
 const aiRes = await fetch(
-  "https://decisio-x-lu67.onrender.com/api/ai/recommendation",
+  "https://decisiox-backend.onrender.com/api/ai/recommendation",
   {
     method: "POST",
     headers: {
@@ -510,10 +559,6 @@ const exportPDF = () => {
 <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl shadow-md border border-purple-500">
          <div className="grid md:grid-cols-2 gap-6">
 
-  
-
-   
-
   {/* AGE */}
   <div>
     <Input
@@ -558,7 +603,7 @@ const exportPDF = () => {
       value={formData.amount}
       onChange={handleChange}
     />
-
+ 
     {errors.amount && (
       <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
     )}
@@ -737,12 +782,9 @@ className="w-full mt-8 bg-gradient-to-r from-purple-600 to-purple-800 text-white
 
     <div className="text-gray-700 text-base leading-relaxed">
 
-      <ReactTyped
-        strings={[aiAdvice]}
-        typeSpeed={25}
-        showCursor={true}
-        cursorChar="|"
-      />
+      <p className="typing">
+  {typedAdvice || "Analyzing your profile..."}
+</p>
 
     </div>
 
@@ -873,9 +915,13 @@ className="w-full p-3 rounded-xl border border-gray-400 text-gray-800 bg-white f
         ))}
 
       </select>
+         {/* FLOATING CHATBOT */}
+      <FloatingChat />
+
     </div>
   );
 }
+
 
 export default Simulator;
 

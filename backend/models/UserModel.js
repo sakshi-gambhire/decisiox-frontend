@@ -1,27 +1,28 @@
 import pool from "../config/db.js";
 
-export const createUser = async (name, email, password) => {
-  const query = `
-    INSERT INTO users (name, email, password)
-    VALUES ($1, $2, $3)
-    RETURNING id, name, email
-  `;
+export const createUser = async (name, email, password, role) => {
+  const result = await pool.query(
+    `INSERT INTO users (name, email, password, role)
+     VALUES ($1, $2, $3, $4)
+     RETURNING *`,
+    [name, email, password, role]
+  );
 
-  const values = [name, email, password];
-
-  const result = await pool.query(query, values);
-
-  return result.rows[0];
+  return result.rows[0]; // ✅ THIS IS CRITICAL
 };
 
 export const findUserByEmail = async (email) => {
+
   const query = `
-    SELECT * FROM users WHERE email = $1
+    SELECT *
+    FROM users
+    WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))
   `;
 
   const result = await pool.query(query, [email]);
 
   return result.rows[0];
+
 };
 // GET ALL USERS (ADMIN)
 export const getAllUsers = async () => {
@@ -106,6 +107,7 @@ export const findUserById = async (userId) => {
   return result.rows[0];
 
 };
+
 export const updateUserPassword = async (userId, hashedPassword) => {
 
   await pool.query(

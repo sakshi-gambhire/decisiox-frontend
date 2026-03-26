@@ -18,7 +18,7 @@ const fetchUsers = async () => {
     const token = localStorage.getItem("token");
 
     const response = await fetch(
-      "https://decisio-x-lu67.onrender.com/api/admin/users",
+      "https://decisiox-backend.onrender.com/api/admin/users",
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -54,7 +54,7 @@ try {
   const token = localStorage.getItem("token");
 
   const response = await fetch(
-    `https://decisio-x-lu67.onrender.com/api/admin/users/${selectedUser.id}`,
+    `https://decisiox-backend.onrender.com/api/admin/users/${selectedUser.id}`,
     {
       method: "DELETE",
       headers: {
@@ -92,7 +92,7 @@ try {
   const token = localStorage.getItem("token");
 
   const response = await fetch(
-    `https://decisio-x-lu67.onrender.com/api/admin/promote/${selectedUser.id}`,
+    `https://decisiox-backend.onrender.com/api/admin/promote/${selectedUser.id}`,
     {
       method: "PUT",
       headers: {
@@ -132,7 +132,7 @@ try {
   const token = localStorage.getItem("token");
 
   const response = await fetch(
-    `https://decisio-x-lu67.onrender.com/api/admin/demote/${id}`,
+    `https://decisiox-backend.onrender.com/api/admin/demote/${id}`,
     {
       method: "PUT",
       headers: {

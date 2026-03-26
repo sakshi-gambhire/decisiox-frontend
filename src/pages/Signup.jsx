@@ -1,6 +1,7 @@
-import { useState } from "react";
+
 import { Link } from "react-router-dom";
 
+import { useState, useEffect } from "react";
 function Signup() {
 
   const [formData, setFormData] = useState({
@@ -10,10 +11,42 @@ function Signup() {
   });
 
   const [toast, setToast] = useState(null);
+  useEffect(() => {
+  /* global google */
+
+  if (window.google) {
+    google.accounts.id.initialize({
+      client_id: "498968811146-mir587bc82pfb4g0076c74q5abn4vt4m.apps.googleusercontent.com",
+      callback: handleGoogleResponse,
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("googleBtnSignup"),
+      {
+        theme: "outline",
+        size: "large",
+        width: 320,
+      }
+    );
+  }
+}, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { name, value } = e.target;
+
+  if (name === "name") {
+    // prevent multiple spaces
+    setFormData({
+      ...formData,
+      name: value.replace(/\s{2,}/g, " "),
+    });
+  } else {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  }
+};
 
   const showToast = (type, message) => {
 
@@ -26,13 +59,47 @@ function Signup() {
   };
 
   const handleSubmit = async (e) => {
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+  showToast("error", "Enter a valid email");
+  return;
+}
+
+
+const password = formData.password;
+
+// length check
+if (password.length < 6) {
+  showToast("error", "Password must be at least 6 characters.");
+  return;
+}
+
+// 🔥 NEW: strong password check
+if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+  showToast("error", "Password must contain letters and numbers.");
+  return;
+}
 
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.password) {
-      showToast("error", "All fields are required.");
-      return;
-    }
+    if (!formData.name.trim()) {
+  showToast("error", "Full name is required");
+  return;
+}
+
+if (!formData.email.trim()) {
+  showToast("error", "Email is required");
+  return;
+}
+
+if (!formData.password.trim()) {
+  showToast("error", "Password is required");
+  return;
+}
+    // 🔥 EMAIL VALIDATION
+if (!/\S+@\S+\.\S+/.test(formData.email)) {
+  showToast("error", "Enter a valid email address");
+  return;
+}
 
     if (formData.password.length < 6) {
       showToast("error", "Password must be at least 6 characters.");
@@ -41,7 +108,7 @@ function Signup() {
 
     try {
 
-      const response = await fetch("https://decisio-x-lu67.onrender.com/api/auth/signup", {
+      const response = await fetch("https://decisiox-backend.onrender.com/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -57,7 +124,8 @@ function Signup() {
       }
 
       /* store user name */
-      localStorage.setItem("userName", formData.name);
+      localStorage.setItem("userName", data.user.name);
+localStorage.setItem("role", data.user.role);
 
       /* store token */
       localStorage.setItem("token", data.token);
@@ -65,7 +133,7 @@ function Signup() {
       /* store auth type */
       localStorage.setItem("authType", "signup");
 
-      showToast("success", "Account created successfully 🎉");
+      showToast("success", "Account created successfully");
 
       setTimeout(() => {
         window.location.href = "/";
@@ -79,6 +147,45 @@ function Signup() {
     }
 
   };
+  // ✅ GOOGLE LOGIN HANDLER
+
+
+// ✅ GOOGLE RESPONSE HANDLER
+const handleGoogleResponse = async (response) => {
+  try {
+    const res = await fetch("https://decisiox-backend.onrender.com/api/auth/google", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        credential: response.credential,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast("error", "Google signup failed");
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userName", data.user.name);
+    localStorage.setItem("userEmail", data.user.email);
+    localStorage.setItem("role", data.user.role);
+
+    showToast("success", "Google Signup Successful");
+
+    setTimeout(() => {
+      window.location.href = "/simulator";
+    }, 1000);
+
+  } catch (error) {
+    console.error(error);
+    showToast("error", "Google signup error");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f5f3ff] via-[#ede9fe] to-[#e9d5ff] px-6 relative overflow-hidden">
@@ -113,19 +220,19 @@ function Signup() {
         </p>
 
         <div className="mb-4">
-          <label className="text-sm text-gray-700 block mb-2">Full Name</label>
-          <input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            type="text"
-            placeholder="Enter your full name"
-            className="w-full p-3 rounded-xl border border-purple-200 text-gray-800 bg-white focus:ring-2 focus:ring-purple-400"
-          />
+          
+         <input
+  name="name"
+  value={formData.name}
+  onChange={handleChange}
+  type="text"
+  required
+  placeholder="Enter your full name"
+  className="w-full p-3 rounded-xl border border-purple-200 text-gray-800 bg-white focus:ring-2 focus:ring-purple-400"
+/>
         </div>
 
         <div className="mb-4">
-          <label className="text-sm text-gray-700 block mb-2">Email</label>
           <input
             name="email"
             value={formData.email}
@@ -138,7 +245,6 @@ function Signup() {
         </div>
 
         <div className="mb-6">
-          <label className="text-sm text-gray-700 block mb-2">Password</label>
           <input
             name="password"
             value={formData.password}
@@ -150,12 +256,34 @@ function Signup() {
           />
         </div>
 
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl"
-        >
-          Sign Up
-        </button>
+<button
+  onClick={handleSubmit}
+  disabled={
+    !formData.name.trim() ||
+    !formData.email.trim() ||
+    !formData.password.trim()
+  }
+  className={`w-full py-3 rounded-xl font-semibold transition ${
+    !formData.name.trim() ||
+    !formData.email.trim() ||
+    !formData.password.trim()
+      ? "!bg-purple-700 !text-white cursor-not-allowed"
+      : "!bg-gradient-to-r !from-purple-600 !to-purple-700 !text-white hover:opacity-95"
+  }`}
+>
+  Sign Up
+</button>
+        {/* DIVIDER */}
+<div className="flex items-center my-5">
+  <div className="flex-1 h-px bg-gray-300"></div>
+  <span className="px-3 text-sm text-gray-500">or</span>
+  <div className="flex-1 h-px bg-gray-300"></div>
+</div>
+
+{/* GOOGLE BUTTON */}
+<div className="w-full flex justify-center mt-2">
+  <div id="googleBtnSignup"></div>
+</div>
 
         <p className="text-gray-500 text-sm text-center mt-6">
           Already have an account?{" "}
@@ -165,8 +293,10 @@ function Signup() {
         </p>
 
       </div>
+      
     </div>
   );
+  
 }
 
 export default Signup;

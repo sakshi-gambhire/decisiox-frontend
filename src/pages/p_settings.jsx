@@ -5,7 +5,7 @@ function PSettings() {
 useEffect(() => {
   const fetchProfile = async () => {
     try {
-      const res = await fetch("https://decisio-x-lu67.onrender.com/api/auth/profile", {
+      const res = await fetch("https://decisiox-backend.onrender.com/api/auth/profile", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -43,7 +43,7 @@ const [email, setEmail] = useState("");
 
       setSaveStatus("saving");
 
-      const res = await fetch("https://decisio-x-lu67.onrender.com/api/auth/update-profile", {
+      const res = await fetch("https://decisiox-backend.onrender.com/api/auth/update-profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const [email, setEmail] = useState("");
 
       setPasswordStatus("saving");
 
-      const res = await fetch("https://decisio-x-lu67.onrender.com/api/auth/change-password", {
+      const res = await fetch("https://decisiox-backend.onrender.com/api/auth/change-password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

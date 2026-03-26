@@ -15,7 +15,7 @@ function Profile() {
 
       try {
 
-        const res = await fetch("https://decisio-x-lu67.onrender.com/api/auth/profile", {
+        const res = await fetch("https://decisiox-backend.onrender.com/api/auth/profile", {
           headers: {
             Authorization: `Bearer ${token}`
           }

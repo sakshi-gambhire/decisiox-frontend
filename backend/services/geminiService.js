@@ -66,3 +66,54 @@ Rules:
 
   }
 };
+export const generateChatResponse = async (message, userProfile = null) => {
+  try {
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash"
+    });
+
+    // 🧠 Create dynamic prompt
+    let prompt = `
+You are a smart financial AI assistant.
+
+Your job:
+- Answer user questions about finance, investing, money
+- Keep answers simple and practical
+- Be conversational like ChatGPT
+
+`;
+
+    // 👉 Add user financial context (VERY IMPORTANT SaaS feature)
+    if (userProfile) {
+      prompt += `
+User Profile:
+Age: ${userProfile.age}
+Income: ${userProfile.income}
+Savings: ${userProfile.savings}
+Risk: ${userProfile.risk}
+Horizon: ${userProfile.horizon}
+`;
+    }
+
+    // 👉 Add user message
+    prompt += `
+User Question:
+${message}
+
+Rules:
+- Keep answer short (3-5 lines)
+- Be clear and actionable
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    return text;
+
+  } catch (error) {
+    console.error("Chatbot Error:", error);
+    throw new Error("Failed to generate chat response");
+  }
+};

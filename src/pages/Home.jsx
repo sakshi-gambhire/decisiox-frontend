@@ -28,6 +28,7 @@ function Home() {
   return (
   <>
 
+
     {/* HERO SECTION */}
     <section className="relative w-screen min-h-screen bg-gradient-to-br from-white via-purple-50 to-purple-100 overflow-hidden">
 

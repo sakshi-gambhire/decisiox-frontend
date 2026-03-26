@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { UserCircle } from "phosphor-react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 function Navbar() {
 
@@ -59,6 +59,10 @@ function Navbar() {
             <Link to="/" className="hover:text-purple-600">Home</Link>
 
             <Link to="/simulator" className="hover:text-purple-600">Simulator</Link>
+            <Link to="/bias-detector" className="hover:text-purple-600">
+  Bias Detector
+</Link>
+<Link to="/bias-history">History</Link>
 
             {!token ? (
               <>
@@ -66,7 +70,7 @@ function Navbar() {
 
                 <Link
                   to="/signup"
-                  className="bg-purple-500 text-white px-6 py-2 rounded-xl"
+                  className="bg-purple-300 text-white px-6 py-2 rounded-xl"
                 >
                   Sign Up
                 </Link>
@@ -173,6 +177,7 @@ function Navbar() {
 
         </div>
       )}
+      
 
     </>
   );

@@ -1,11 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
+import chatRoutes from "./routes/chatRoutes.js";
 // Load env variables FIRST
 import path from "path";
 import { fileURLToPath } from "url";
-
+import biasRoutes from "./routes/biasRoutes.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config({
@@ -28,25 +28,31 @@ import simulationRoutes from "./routes/simulationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 
+
 const app = express();
 
 // Middleware
-app.use(cors());
+
+
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  credentials: true
+}));
 app.use(express.json());
+
+app.use("/api/bias", biasRoutes);
 app.use((req, res, next) => {
   console.log(`Incoming Request → ${req.method} ${req.url}`);
   next();
 });
 
 // API Routes
+app.use("/api/chat", chatRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/simulations", simulationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/ai", aiRoutes);
-app.use((req, res, next) => {
-  console.log("Incoming Request:", req.method, req.url);
-  next();
-});
+
 
 // Root route
 app.get("/", (req, res) => {
@@ -70,6 +76,7 @@ app.get("/api/test/models", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
